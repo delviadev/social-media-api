@@ -1,0 +1,65 @@
+// use prisma-8
+
+model User {
+    id Int @id @default(autoincrement())
+    fullname VarChar(255)
+    email VarChar(255) @unique
+    username VarChar(255) @unique
+    password VarChar(255)
+    bio String
+    image VarChar(255)?
+    imageId VarChar(255)?
+    followingCount Int @default(0)
+    followersCount Int @default(0)
+    postCount Int @default(0)
+    createAt DateTime @default(now())
+
+    posts Post[]
+    comments Comment[]
+    bookmarks Bookmark[]
+    follower Follow[] @relation("follower")
+    following Follow[] @relation("following")
+}
+
+model Post {
+    id Int @id @default(autoincrement())
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+    image VarChar(255)
+    imageId VarChar(255)
+    caption String
+    commentCount Int @default(0)
+    likeCount Int @default(0)
+    createAt DateTime @default(now())
+
+    comments Comment[]
+    bookmarks Bookmark[]
+}
+
+model Comment {
+    id Int @id @default(autoincrement())
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+    postId Int
+    post Post @relation(fields: [postId], references: [id])
+    comment String
+    createAt DateTime @default(now())
+}
+
+model Bookmark {
+    userId Int
+    user User @relation(fields: [userId], references: [id])
+    postId Int
+    post Post @relation(fields: [postId], references: [id])
+    createAt DateTime @default(now())
+    @@id([userId, postId])
+}
+
+model Follow {
+    followerId Int
+    follower User @relation("follower", fields: [followerId], references: [id])
+    followingId Int
+    following User @relation("following", fields: [followingId], references: [id])
+    createAt DateTime @default(now())
+    @@id([followerId, followingId])
+}
